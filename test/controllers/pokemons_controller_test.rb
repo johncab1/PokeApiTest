@@ -24,9 +24,11 @@ class PokemonsControllerTest < ActionDispatch::IntegrationTest
     param = {
       name: "pikachu"
     }
-
-    assert_difference "Pokemon.count" do
-      post search_path, params: param
+    VCR.use_cassette("search_pikachu") do
+      assert_difference "Pokemon.count" do
+        #PokemonLocatorService.any_instance.expects(:call).returns(Pokemon.create(name: "pikachu", number:'25'))
+        post search_path, params: param
+      end
     end
 
     assert_equal "pikachu's number is 25", flash[:notice]
@@ -37,10 +39,12 @@ class PokemonsControllerTest < ActionDispatch::IntegrationTest
     param = {
       name: "pika"
     }
-
-    assert_no_difference "Pokemon.count" do
-      post search_path, params: param
+    VCR.use_cassette("search_pika") do
+      assert_no_difference "Pokemon.count" do
+        post search_path, params: param
+      end
     end
+
 
     assert_equal "No pokemon found", flash[:error]
     assert_redirected_to root_path
@@ -51,10 +55,12 @@ class PokemonsControllerTest < ActionDispatch::IntegrationTest
     param = {
       name: "pika pika"
     }
-
-    assert_no_difference "Pokemon.count" do
-      post search_path, params: param
+    VCR.use_cassette("search_pika_pika") do
+      assert_no_difference "Pokemon.count" do
+        post search_path, params: param
+      end
     end
+
 
     assert_equal "No pokemon found", flash[:error]
     assert_redirected_to root_path
